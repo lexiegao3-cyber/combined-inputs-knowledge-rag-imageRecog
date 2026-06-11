@@ -1,0 +1,238 @@
+# =============================================================================
+# Supply Chain Compliance — Rules Engine Configuration
+# =============================================================================
+# This YAML file defines all business rules in a data-driven format.
+# Each rule has:
+#   - id:         unique rule identifier
+#   - name:       human-readable name
+#   - description: what it does
+#   - jurisdictions: which regulatory regions this applies to
+#   - severity:   LOW / MEDIUM / HIGH / CRITICAL
+#   - trigger:    condition that fires the rule
+#   - actions:    what to do when triggered (mutations, notifications, blocks)
+#   - depends_on: (optional) rule IDs that must run first
+#
+# Adding a rule = adding a YAML block. No Python code changes needed.
+# =============================================================================
+
+rules:
+
+  # ── Rule 1: Financial Limit ──────────────────────────────────────────────
+  - id: financial_limit
+    name: Financial Risk Escalation
+    description: >
+      If any risk item's estimated_cost_usd exceeds the configured limit,
+      escalate matching actions to "Critical" priority.
+    jurisdictions: ["US", "EU", "UK", "SEA"]
+    severity: HIGH
+    trigger:
+      field: "risks[].estimated_cost_usd"
+      operator: ">"
+      value: 100000
+    actions:
+      - type: mutate_payload
+        target: "actions[?contains(action_id, risk.risk_id) || contains(payload.risk_id, risk.risk_id)].payload"
+        set:
+          priority: "Critical"
+          escalation_reason: "estimated_cost_usd ${{risk.estimated_cost_usd:,.2f}} exceeds limit $100,000.00"
+      - type: warn
+        message: "Financial limit exceeded for risk_id='{{risk.risk_id}}' cost=${{risk.estimated_cost_usd:,.2f}}"
+    depends_on: []
+
+  # ── Rule 2: Low Confidence Escalation ────────────────────────────────────
+  - id: low_confidence
+    name: Low Confidence / Data Quality Gate
+    description: >
+      If the AI analysis confidence score is below the threshold, override
+      pipeline_step to ESCALATED_TO_HUMAN and block all automated actions.
+    jurisdictions: ["US", "EU", "UK", "SEA"]
+    severity: CRITICAL
+    trigger:
+      field: "ai_analysis.confidence_score"
+      operator: "<"
+      value: 0.60
+    actions:
+      - type: set_field
+        target: "system_status.pipeline_step"
+        value: "ESCALATED_TO_HUMAN"
+      - type: block_actions
+        reason: "Low confidence score"
+      - type: violation
+        message: >
+          confidence_score={{analysis.ai_analysis.confidence_score:.3f}} is below
+          threshold 0.60. Pipeline step overridden to ESCALATED_TO_HUMAN.
+    depends_on: []
+
+  # ── Rule 3: Action Routing Validation ────────────────────────────────────
+  - id: action_routing
+    name: Target System Validation
+    description: >
+      Every action's target_system must be one of the allowed values.
+      Invalid entries are reported as hard violations.
+    jurisdictions: ["US", "EU", "UK", "SEA"]
+    severity: HIGH
+    trigger:
+      field: "actions[].target_system"
+      operator: "not_in"
+      value: ["JIRA", "SLACK", "EMAIL", "SAP"]
+    actions:
+      - type: violation
+        message: >
+          Invalid target_system '{{action.target_system}}' for
+          action_id='{{action.action_id}}'. Allowed: JIRA, SLACK, EMAIL, SAP.
+    depends_on: []
+
+  # ── Rule 4: US Section 301 Tariff Check ──────────────────────────────────
+  - id: section_301_tariff
+    name: US Section 301 Tariff Flag
+    description: >
+      If a compliance item references US CBP and type is TARIFF_CLASSIFICATION,
+      flag for expedited review and notify the compliance team.
+    jurisdictions: ["US"]
+    severity: HIGH
+    trigger:
+      field: "compliance_items[?regulatory_body == 'US_CBP' && type == 'TARIFF_CLASSIFICATION']"
+      operator: "exists"
+    actions:
+      - type: mutate_payload
+        target: "actions[].payload"
+        set:
+          requires_urgent_review: true
+          regulatory_framework: "Section 301"
+      - type: notify
+        channel: "slack"
+        recipient: "#us-compliance"
+        message: "Section 301 tariff flag detected — urgent review needed."
+    depends_on: []
+
+  # ── Rule 5: EU REACH Chemical Compliance ────────────────────────────────
+  - id: eu_reach_compliance
+    name: EU REACH Chemical Compliance Check
+    description: >
+      If a shipment contains chemicals (SKU prefix CHEM) and destination
+      is an EU port, flag for REACH compliance verification.
+    jurisdictions: ["EU", "UK"]
+    severity: MEDIUM
+    trigger:
+      field: "ai_analysis.extracted_entities.sku_affected"
+      operator: "regex"
+      value: "^SKU-\\d+-CHEMICALS"
+    actions:
+      - type: add_compliance_flag
+        flag_type: "REACH_COMPLIANCE"
+        severity: "MEDIUM"
+        description: "Chemical shipment to EU — verify REACH registration."
+        regulatory_body: "EU_ECHA"
+      - type: warn
+        message: "REACH compliance flag added for chemical SKU"
+    depends_on: []
+
+  # ── Rule 6: High Probability + High Cost = Escalate ─────────────────────
+  - id: high_probability_high_cost
+    name: Combined Risk Score Escalation
+    description: >
+      If a risk has both HIGH probability AND cost > $50,000, escalate to Critical.
+    jurisdictions: ["US", "EU", "UK", "SEA"]
+    severity: CRITICAL
+    trigger:
+      field: "risks[?probability == 'HIGH' && estimated_cost_usd > 50000]"
+      operator: "exists"
+    actions:
+      - type: set_field
+        target: "system_status.pipeline_step"
+        value: "ESCALATED_TO_HUMAN"
+      - type: notify
+        channel: "email"
+        recipient: "compliance-officer@company.com"
+        message: "High probability + high cost risk detected — immediate review required."
+      - type: violation
+        message: >
+          Risk '{{risk.risk_id}}' has HIGH probability and
+          cost=${{risk.estimated_cost_usd:,.2f}} > $50,000.
+    depends_on: []
+
+  # ── Rule 7: Missing Country of Origin Certificate ───────────────────────
+  - id: missing_coo_certificate
+    name: Missing Country of Origin Certificate
+    description: >
+      If a compliance item is of type COUNTRY_OF_ORIGIN with status MISSING,
+      create a high-severity flag and alert logistics.
+    jurisdictions: ["US", "EU"]
+    severity: HIGH
+    trigger:
+      field: "compliance_items[?type == 'COUNTRY_OF_ORIGIN' && status == 'MISSING']"
+      operator: "exists"
+    actions:
+      - type: set_field
+        target: "compliance_items[?item_id == '{{item.item_id}}'].severity"
+        value: "HIGH"
+      - type: notify
+        channel: "slack"
+        recipient: "#logistics-alerts"
+        message: "Missing COO certificate for {{item.item_id}} — CBP hold risk."
+    depends_on: []
+
+  # ── Rule 8: Port Congestion / Delay Detection ───────────────────────────
+  - id: port_congestion_delay
+    name: Port Congestion / Delay Warning
+    description: >
+      If a risk's category is DELAY and probability is HIGH, or cost > $10,000,
+      add a compliance flag and alert the operations team.
+    jurisdictions: ["US", "EU", "UK", "SEA"]
+    severity: MEDIUM
+    trigger:
+      field: "risks[?category == 'DELAY' && (probability == 'HIGH' || estimated_cost_usd > 10000)]"
+      operator: "exists"
+    actions:
+      - type: add_compliance_flag
+        flag_type: "DELAY_WARNING"
+        severity: "MEDIUM"
+        description: "Significant delay risk detected — monitor closely."
+        regulatory_body: "INTERNAL_OPS"
+      - type: warn
+        message: "Delay risk '{{risk.risk_id}}' requires operational attention."
+    depends_on: []
+
+  # ── Rule 9: Multi-Language Document Alert ───────────────────────────────
+  - id: multi_language_document
+    name: Non-English Document Handling
+    description: >
+      If the primary language is not English (en) and confidence is acceptable,
+      flag for bilingual review.
+    jurisdictions: ["US", "EU", "UK"]
+    severity: LOW
+    trigger:
+      field: "ai_analysis.primary_language"
+      operator: "not_in"
+      value: ["en"]
+    actions:
+      - type: add_compliance_flag
+        flag_type: "LANGUAGE_REVIEW"
+        severity: "LOW"
+        description: "Document in {{analysis.ai_analysis.primary_language}} — bilingual review recommended."
+        regulatory_body: "INTERNAL"
+      - type: warn
+        message: "Non-English document ({{analysis.ai_analysis.primary_language}}) — flagging for review."
+    depends_on: []
+
+  # ── Rule 10: Expedited Shipment Check ───────────────────────────────────
+  - id: expedited_shipment_check
+    name: Expedited / Premium Shipment Audit
+    description: >
+      If estimated delivery is within 72 hours of ingestion, flag for priority
+      processing to avoid premium freight charges.
+    jurisdictions: ["US", "EU", "UK", "SEA"]
+    severity: MEDIUM
+    trigger:
+      field: "ai_analysis.extracted_entities.estimated_delivery"
+      operator: "within_hours"
+      value: 72
+    actions:
+      - type: add_compliance_flag
+        flag_type: "EXPEDITED_SHIPMENT"
+        severity: "MEDIUM"
+        description: "Shipment due within 72h — expedited processing recommended."
+        regulatory_body: "INTERNAL_OPS"
+      - type: warn
+        message: "Expedited shipment detected — prioritize processing."
+    depends_on: []

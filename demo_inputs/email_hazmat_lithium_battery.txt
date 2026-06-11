@@ -1,0 +1,13 @@
+From: airfreightdesk@carrier.example
+Sent: Thursday, June 11, 2026 13:20 PM
+To: inbound-ops@greenchem.example
+Subject: Dangerous Goods Documentation Gap - Lithium Battery Modules
+
+Air shipment AIR-LAX-3307 includes lithium battery modules, SKU-BATT-5519.
+Origin airport: Shenzhen (SZX).
+Destination airport: Los Angeles (LAX).
+
+The booking references UN3480 lithium ion batteries, but the dangerous goods declaration is missing packing instruction details.
+The package label photo shows Class 9 hazard marking, but the shipping papers do not include emergency response information.
+
+Carrier will not tender cargo until PHMSA/DOT hazardous materials documentation is verified.

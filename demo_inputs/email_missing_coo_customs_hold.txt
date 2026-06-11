@@ -1,0 +1,15 @@
+From: release.team@border-broker.example
+Sent: Thursday, June 11, 2026 10:15 AM
+To: logistics@greenchem.example
+Subject: CBP Hold - Missing Country of Origin Certificate for SHP-VNM-2099
+
+CBP has placed shipment SHP-VNM-2099 on document hold at Port of Los Angeles.
+Origin port: Ho Chi Minh City (VNSGN).
+Destination port: Los Angeles (USLAX).
+SKU affected: SKU-TEXT-8842, synthetic industrial poly-weave rolls.
+
+The commercial invoice says Vietnam origin, but the packing list references China-origin raw material.
+The supplier has not provided a country of origin certificate or substantial transformation support.
+Delivery appointment is within 48 hours. Demurrage may begin tomorrow.
+
+Please alert logistics and request corrected COO documentation from the supplier immediately.

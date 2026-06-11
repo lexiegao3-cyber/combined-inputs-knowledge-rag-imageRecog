@@ -1,0 +1,57 @@
+{
+  "system_status": {
+    "status": "SUCCESS",
+    "environment": "LOCAL_MVP",
+    "pipeline_step": "AI_COMPLETED",
+    "retry_count": 0
+  },
+  "source_info": {
+    "organization_id": "org_acme_global",
+    "document_id": "doc_perfect_run_101",
+    "source_type": "TEXT_STREAM",
+    "filename": "perfect_manifest.txt",
+    "ingested_at": "2026-06-09T17:05:00Z"
+  },
+  "ai_analysis": {
+    "confidence_score": 0.98,
+    "primary_language": "en",
+    "extracted_entities": {
+      "carrier": "Maersk",
+      "origin_port": "Port of Singapore",
+      "destination_port": "Port of Newark",
+      "sku_affected": "SKU-4412-CORE",
+      "estimated_delivery": "2026-07-15"
+    }
+  },
+  "compliance_items": [
+    {
+      "item_id": "comp_ok_01",
+      "type": "DOCUMENTATION_CHECK",
+      "description": "Customs clearance forms verified against standard regulatory manifests.",
+      "status": "PASSED",
+      "severity": "LOW",
+      "regulatory_body": "US CBP"
+    }
+  ],
+  "risks": [
+    {
+      "risk_id": "risk_low_01",
+      "category": "FINANCIAL_IMPACT",
+      "summary": "Standard transit lane variations within normal cost margins.",
+      "probability": "LOW",
+      "estimated_cost_usd": 1200.00
+    }
+  ],
+  "actions": [
+    {
+      "action_id": "act_slack_01",
+      "target_system": "slack",
+      "action_type": "SEND_ALERT",
+      "summary": "Notify logistics channel that perfect run manifest was processed.",
+      "payload": {
+        "channel": "#ops-logs"
+      },
+      "status": "PENDING"
+    }
+  ]
+}

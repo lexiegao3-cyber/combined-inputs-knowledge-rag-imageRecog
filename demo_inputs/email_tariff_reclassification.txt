@@ -1,0 +1,13 @@
+From: broker.ops@pacific-customs.example
+Sent: Thursday, June 11, 2026 08:40 AM
+To: import-compliance@greenchem.example
+Subject: URGENT HTS Review - China-Origin Electronics Components SHP-CHN-4481
+
+Shipment SHP-CHN-4481 is inbound from Shanghai (CNSHA) to Los Angeles (USLAX) on Pacific Star V-118.
+SKU affected: SKU-EL-4892, industrial electronics controller boards.
+Declared value: 1,180,000 USD.
+
+The customs broker believes the current HTS code 8537.10 may be incomplete and may require review under a Section 301 China tariff line.
+Estimated additional duty exposure is 142,000 USD if reclassified.
+
+Please open a compliance review ticket and notify finance before entry summary filing.

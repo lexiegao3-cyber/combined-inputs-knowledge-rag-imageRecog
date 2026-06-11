@@ -1,0 +1,11 @@
+From: sourcing.audit@greenchem.example
+Sent: Thursday, June 11, 2026 15:10 PM
+To: legal-compliance@greenchem.example
+Subject: UFLPA Traceability Concern - Solar Controller Supplier
+
+Supplier Xinjiang-linked component concern identified for shipment SHP-SOLAR-6610.
+Product: solar inverter controller assemblies, SKU-SOLAR-2201.
+Raw material disclosure mentions polysilicon subcomponents from an upstream supplier that has not provided chain-of-custody documents.
+
+The supplier declined to provide full traceability records and asked whether a purchase order summary would be sufficient.
+Because the goods are inbound to the United States, please review UFLPA forced labor due diligence requirements before release.

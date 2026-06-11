@@ -1,0 +1,25 @@
+# Supply Chain Compliance Platform — Python dependencies
+# Python 3.10+
+
+pydantic>=2.7,<3.0
+sqlalchemy>=2.0,<3.0
+pyyaml>=6.0
+requests>=2.28
+
+# Optional ingestion drivers used by src/ingest.py and demo_inputs artifacts
+pypdf>=4.0
+pandas>=2.0
+openpyxl>=3.1
+python-docx>=1.1
+reportlab>=4.0
+
+# Optional local multimodal drivers:
+# - OCR for scans/labels/certificates: install pillow + pytesseract,
+#   and install the tesseract system binary separately.
+# - Local audio transcription: install faster-whisper or openai-whisper.
+# pillow>=10.0
+# pytesseract>=0.3
+# faster-whisper>=1.0
+# openai-whisper>=20231117
+# For PostgreSQL/Aurora support later — install when needed:
+# psycopg2-binary>=2.9

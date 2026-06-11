@@ -1,0 +1,13 @@
+From: supplier.docs@chem-sourcing.example
+Sent: Thursday, June 11, 2026 11:05 AM
+To: compliance@greenchem.example
+Subject: Missing TSCA Certification - Solvent Additive Shipment SHP-CHEM-7720
+
+Shipment SHP-CHEM-7720 contains solvent additive SKU-CHEM-1102 for import into the United States.
+Origin port: Busan (KRPUS).
+Destination port: Long Beach (USLGB).
+
+The supplier provided an SDS but omitted the CAS number for one component and did not provide a TSCA import certification statement.
+The customs broker asked whether the substance is subject to EPA TSCA requirements or qualifies for negative certification.
+
+Please hold release until compliance confirms CAS numbers, SDS completeness, and TSCA import status.

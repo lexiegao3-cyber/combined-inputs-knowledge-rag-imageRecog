@@ -1,0 +1,22 @@
+{
+  "source": "simulated_port_congestion_api",
+  "scraped_at": "2026-06-11T16:00:00Z",
+  "port": "USLAX",
+  "signal_type": "port_congestion",
+  "severity": "HIGH",
+  "affected_shipments": [
+    "SHP-VNM-2099",
+    "SHP-CHN-4481"
+  ],
+  "details": {
+    "average_dwell_days": 5.8,
+    "demurrage_risk": true,
+    "customs_documentation_backlog": true,
+    "notes": "Terminal reports higher dwell time for containers pending CBP document review."
+  },
+  "recommended_review": [
+    "Prioritize shipments with missing COO documents",
+    "Notify logistics if delivery deadline is within 72 hours",
+    "Estimate demurrage and detention exposure"
+  ]
+}

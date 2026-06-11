@@ -1,0 +1,4 @@
+shipment_id,sku,origin_country,destination_port,hts_code,declared_value_usd,document_status,risk_notes
+SHP-CHN-4481,SKU-EL-4892,China,USLAX,8537.10,1180000,HTS review required,Broker flagged possible Section 301 exposure
+SHP-VNM-2099,SKU-TEXT-8842,Vietnam,USLAX,5903.90,420000,COO missing,Packing list references China-origin raw material
+SHP-CHEM-7720,SKU-CHEM-1102,South Korea,USLGB,3814.00,260000,TSCA certification missing,CAS number missing for solvent component
